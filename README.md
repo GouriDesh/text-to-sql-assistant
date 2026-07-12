@@ -26,11 +26,11 @@ Follow this step by step guide to mirror the development enviornment and get the
 ### Installation Steps 
 0. **System of Choice**
 MacOS users proceed by using Terminal. Windows users proceed by using Command Prompt or GitBash to run these commands
-1.**Terminal Focus**
+1. **Terminal Focus**
 ```bash
    cd ~/Desktop
 ```
-2.**Clone the project repository**
+2. **Clone the project repository**
 ```bash
    git clone https://github.com/GouriDesh/text-to-sql-assistant.git
    cd text-to-sql-assistant
@@ -56,7 +56,7 @@ python -m ipykernel install --user --name=venv --display-name "Python 3 (Project
 ```bash
 touch .env
 ```
-8.**Configure OpenAI API Key**
+8. **Configure OpenAI API Key**
 ```bash
 OPENAI_API_KEY=your_actual_api_key_here
 ```
