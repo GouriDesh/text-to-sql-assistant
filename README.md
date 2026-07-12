@@ -23,8 +23,42 @@ Follow this step by step guide to mirror the development enviornment and get the
 * Python 3.12+
 * An active OpenAI API Key with usage credits
 
-### Installation Steps
-1. **Clone the project repository**
+### Installation Steps (MacOS)
+1.**Terminal Focus**
 ```bash
-   git clone [https://github.com/GouriDesh/text-to-sql-assistant.git](https://github.com/GouriDesh/text-to-sql-assistant.git)
+   cd ~/Desktop
+```
+2.**Clone the project repository**
+```bash
+   git clone https://github.com/GouriDesh/text-to-sql-assistant.git
    cd text-to-sql-assistant
+```
+3. **Configure Virtual Environment**
+ ```bash
+    python3 -m venv venv
+```
+4. **Activate Virtual Environment**
+```bash
+source venv/bin/activate
+```
+5. **Install Package Installer and Softwares**
+```bash
+pip install --upgrade pip
+pip install openai langchain langchain-openai python-dotenv jupyter ipykernel
+```
+6. **Link Virtual Environment to Jupyter**
+```bash
+python -m ipykernel install --user --name=venv --display-name "Python 3 (Project Venv)"
+```
+7. **Create Enviornment Configuration File**
+```bash
+touch .env
+```
+8.**Configure OpenAI API Key**
+```bash
+OPENAI_API_KEY=your_actual_api_key_here
+```
+9. **Launch Notebook**
+```bash
+jupyter notebook
+```
