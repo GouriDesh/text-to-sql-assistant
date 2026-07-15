@@ -44,7 +44,7 @@ In short: once self-correction is factored in, all three models are comparably a
 
 ## 5. References
 
-- Defog SQLCoder benchmark figures and model description: https://www.linkedin.com/posts/rishsriv_we-just-open-sourced-defog-sqlcoder-a-state-of-the-art-activity-7099661704879357952-HnI7
+- Defog SQLCoder benchmark figures and model specs: https://github.com/defog-ai/sqlcoder
 - SQLCoder-8B benchmark results: https://www.marktechpost.com/2024/05/15/defog-ai-introduces-llama-3-based-sqlcoder-8b-a-state-of-the-art-ai-model-for-generating-sql-queries-from-natural-language/
 - SQLCoder fine-tuning methodology: https://defog.ai/blog/sqlcoder2-technical-details/
 - Qwen2.5-7B-Instruct: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
