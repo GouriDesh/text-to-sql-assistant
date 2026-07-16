@@ -50,4 +50,4 @@ In short: once self-correction is factored in, all three models are comparably a
 - SQLCoder fine-tuning methodology: https://defog.ai/blog/sqlcoder2-technical-details/
 - Qwen2.5-7B-Instruct: https://huggingface.co/Qwen/Qwen2.5-7B-Instruct
 - HuggingFace Inference Providers documentation: https://huggingface.co/docs/inference-providers/tasks/chat-completion
-- Live test notebooks: `experiments/model_test_mistral.ipynb` (Qwen), `experiments/model_test_sqlcoder.ipynb` (API attempt), `experiments/model_test_sqlcoder_gpu.ipynb` (live GPU test)
+- Live test notebooks: `experiments/model_test_qwen.ipynb` (Qwen), `experiments/model_test_sqlcoder.ipynb` (API attempt), `experiments/model_test_sqlcoder_gpu.ipynb` (live GPU test)
