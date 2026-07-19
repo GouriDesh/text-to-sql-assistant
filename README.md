@@ -33,6 +33,8 @@ Example interactions this project targets:
 text-to-sql-assistant/
 ├── data/
 │   └── Chinook_Sqlite.sqlite       # Local SQLite database (downloaded, not written by us)
+├── configs/
+│   └── model_config.yaml           # Centralized model and parameter configs
 ├── experiments/
 │   ├── schema_extraction.ipynb     # Step 1: reads schema from the database
 │   ├── core_pipeline.ipynb         # Step 2: prompt building, LLM call, SQL execution,
@@ -41,6 +43,8 @@ text-to-sql-assistant/
 ├── docs/
 │   └── evaluation_results.md       # Recorded accuracy results from the benchmark run
 ├── .env                            # Your personal API key — NEVER committed (see Section 4)
+├── utils/
+│   └── helpers.py                  # Helper functions for prompt format, build, and corrections
 ├── .gitignore                      # Excludes .env, venv/, __pycache__, checkpoints, etc.
 ├── requirements.txt                # Pinned package versions for reproducibility
 ├── LICENSE                         # MIT License
