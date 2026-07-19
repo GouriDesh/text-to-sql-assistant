@@ -1,0 +1,6 @@
+```yaml
+model: "gpt-4o-mini"
+temperature: 0
+max_retries: 3
+db_path: "../data/Chinook_Sqlite.sqlite"
+```
