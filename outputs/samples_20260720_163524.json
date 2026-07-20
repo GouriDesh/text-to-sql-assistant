@@ -1,0 +1,68 @@
+[
+  {
+    "question": "Which artist has the most albums?",
+    "sql": "SELECT Artist.Name, COUNT(Album.AlbumId) AS AlbumCount\nFROM Artist\nJOIN Album ON Artist.ArtistId = Album.ArtistId\nGROUP BY Artist.ArtistId\nORDER BY AlbumCount DESC\nLIMIT 1;",
+    "results": [
+      [
+        "Iron Maiden",
+        21
+      ]
+    ]
+  },
+  {
+    "question": "What are the top 5 genres by number of tracks?",
+    "sql": "SELECT g.Name, COUNT(t.TrackId) AS TrackCount\nFROM Genre g\nJOIN Track t ON g.GenreId = t.GenreId\nGROUP BY g.GenreId\nORDER BY TrackCount DESC\nLIMIT 5;",
+    "results": [
+      [
+        "Rock",
+        1297
+      ],
+      [
+        "Latin",
+        579
+      ],
+      [
+        "Metal",
+        374
+      ],
+      [
+        "Alternative & Punk",
+        332
+      ],
+      [
+        "Jazz",
+        130
+      ]
+    ]
+  },
+  {
+    "question": "How many customers are from the USA?",
+    "sql": "SELECT COUNT(*) FROM Customer WHERE Country = 'USA';",
+    "results": [
+      [
+        13
+      ]
+    ]
+  },
+  {
+    "question": "Which employee supports the most customers?",
+    "sql": "SELECT e.EmployeeId, e.FirstName, e.LastName, COUNT(c.CustomerId) AS CustomerCount\nFROM Employee e\nLEFT JOIN Customer c ON e.EmployeeId = c.SupportRepId\nGROUP BY e.EmployeeId\nORDER BY CustomerCount DESC\nLIMIT 1;",
+    "results": [
+      [
+        3,
+        "Jane",
+        "Peacock",
+        21
+      ]
+    ]
+  },
+  {
+    "question": "What is the total revenue in 2022?",
+    "sql": "SELECT SUM(Total) AS TotalRevenue\nFROM Invoice\nWHERE strftime('%Y', InvoiceDate) = '2022';",
+    "results": [
+      [
+        481.45
+      ]
+    ]
+  }
+]
