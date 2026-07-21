@@ -8,6 +8,7 @@ from openai import OpenAI
 
 from src.data_loader import load_config, connect_db, get_schema_string
 from utils.helpers import build_prompt, build_correction_prompt
+from src.sql_safety import is_safe_sql
 
 
 def get_sql_from_llm(client, model, prompt, temperature=0):
@@ -24,9 +25,13 @@ def get_sql_from_llm(client, model, prompt, temperature=0):
 
 
 def run_sql_with_correction(cursor, client, model, schema_string, user_question, sql_query, max_retries=3):
-    """Run SQL, asking the LLM to fix it on failure, up to max_retries times."""
+    """Run SQL, asking the LLM to fix it on failure, up to max_retries times. Every query is checked by the safety scrubber before execution. A query blocked as unsafe is not sent to the LLM for correction as a destructive query is not a bug that needs fixing. The safety scrubber will refuse the query and stop it instead of looping. """
     attempt = 0
     while attempt < max_retries:
+        safe, reason = is_safe_sql(sql_query)
+        if not safe:
+            print(f"BLOCKED: unsafe SQL rejected ({reason}): {sql_query}")
+            return None, sql_query
         try:
             cursor.execute(sql_query)
             results = cursor.fetchall()
