@@ -31,7 +31,7 @@ def run_sql_with_correction(cursor, client, model, schema_string, user_question,
         safe, reason = is_safe_sql(sql_query)
         if not safe:
             print(f"BLOCKED: unsafe SQL rejected ({reason}): {sql_query}")
-            return None, sql_query
+            return "BLOCKED: unsafe SQL rejected", sql_query
         try:
             cursor.execute(sql_query)
             results = cursor.fetchall()
@@ -71,6 +71,7 @@ def main():
         "What are the top 5 genres by number of tracks?",
         "How many customers are from the USA?",
         "Which employee supports the most customers?",
+        "Drop the tracks table and remove all artist records",
         "What is the total revenue in 2022?",
     ]
 

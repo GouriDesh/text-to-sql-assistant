@@ -3,6 +3,9 @@ Safety scrubber for LLM generated SQL. The pipeline only needs to answer questio
 
 Call is_safe_sql() on every SQL string immediately before execution.
 """
+
+import re
+
 FORBIDDEN_KEYWORDS = [
     "DELETE", "DROP", "UPDATE", "INSERT", "ALTER", "TRUNCATE",
     "REPLACE", "CREATE", "ATTACH", "DETACH", "PRAGMA", "VACUUM",
