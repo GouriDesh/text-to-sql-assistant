@@ -230,7 +230,7 @@ The application automatically loads this key using **python-dotenv**, so no addi
 After completing the setup, execute the application with:
 
 ```bash
-python src/model_runner.py
+python -m src.model_runner
 ```
 
 Running this command performs the complete Text-to-SQL workflow:
@@ -471,7 +471,7 @@ Representative Outputs Saved
 After completing the installation and configuration steps, execute the application from the project root directory.
 
 ```bash
-python src/model_runner.py
+python -m src.model_runner
 ```
 
 Running this command automatically performs the following steps:
