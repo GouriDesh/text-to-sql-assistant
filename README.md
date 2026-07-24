@@ -79,7 +79,7 @@ text-to-sql-assistant/
 ├── models/
 │
 ├── outputs/
-│   ├── sample_results.txt
+│   ├── samples_20260724_014747.json
 │   └── README.md
 │
 ├── src/
@@ -488,6 +488,33 @@ Running this command automatically performs the following steps:
 
 ---
 
+## Running with Docker
+
+For a fully reproducible environment, the project can also be run in a Docker container instead of a local virtual environment.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- A `.env` file in the project root containing your OpenAI API key (see Section 3 above)
+
+### Build the image
+
+```bash
+docker build -t text-to-sql-assistant .
+```
+
+### Run the container
+
+```bash
+docker run --env-file .env text-to-sql-assistant
+```
+
+This runs the same end-to-end pipeline as `python -m src.model_runner`, using the Docker image's own isolated Python environment. Results are saved inside the container to `outputs/`, matching the local run's behavior.
+
+**Note:** The Docker build uses `requirements-docker.txt`, a minimal dependency list containing only the packages the application needs to run (`openai`, `python-dotenv`, `PyYAML`). This is separate from the full `requirements.txt`, which includes local development tools (Jupyter, LangChain, etc.) not needed inside the container.
+
+---
+
 ## Example Questions
 
 The application can answer natural language questions such as:
@@ -587,6 +614,7 @@ outputs/
 ```
 
 These outputs demonstrate the application's ability to answer a variety of Text-to-SQL questions and serve as examples for evaluation and future development.
+
 ## 7. Evaluation Summary
 
 The Text-to-SQL Assistant was evaluated using **20 benchmark questions** covering a variety of SQL tasks, including record retrieval, filtering, aggregation, sorting, ranking, and multi-table joins. The evaluation framework is implemented in `experiments/evaluation.ipynb` and was inspired by established Text-to-SQL benchmarks such as **Spider** and **BIRD**.
@@ -652,11 +680,11 @@ An overall accuracy of **95%** indicates that the application performs reliably 
 
 ## 8. Model Selection
 
-Several Large Language Models (LLMs) were considered during development:
+Three models were compared during development:
 
-- OpenAI GPT-4o-mini
-- Meta LLaMA
-- Open-source Hugging Face models (including SQLCoder and Qwen)
+- OpenAI GPT-4o-mini (primary)
+- Qwen2.5-7B-Instruct (open-source alternative, via HuggingFace)
+- SQLCoder-7B (SQL-specialized alternative, tested live on Northeastern's GPU cluster)
 
 After experimentation, **OpenAI GPT-4o-mini** was selected as the primary model for the application.
 
@@ -697,13 +725,9 @@ Several alternative models were evaluated during development.
 
 SQLCoder produced strong SQL queries but required significantly more computational resources and was slower to integrate into the overall pipeline.
 
-### Qwen
+### Qwen2.5-7B-Instruct
 
-Qwen demonstrated promising performance but required additional experimentation and tuning to consistently match GPT-4o-mini's SQL generation quality.
-
-### LLaMA and Hugging Face Models
-
-Open-source models were considered because they eliminate API costs. However, they require local model hosting, additional hardware resources, and potentially fine-tuning before reaching comparable performance.
+Qwen matched GPT-4o-mini's accuracy on our test questions (3/3, no self-correction needed) and is free to run via HuggingFace's Inference API. It was not selected as primary due to GPT-4o-mini's existing integration and paid-API reliability.
 
 For the scope of this project, GPT-4o-mini provided the best combination of simplicity, reliability, and accuracy.
 
