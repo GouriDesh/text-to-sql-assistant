@@ -79,8 +79,9 @@ text-to-sql-assistant/
 ├── models/
 │
 ├── outputs/
-│   ├── sample_results.txt
-│   └── README.md
+├── description.md
+├── sample_output_before_safety_scrubber.json
+└── sample_output_after_safety_scrubber.json
 │
 ├── src/
 │   ├── __init__.py
