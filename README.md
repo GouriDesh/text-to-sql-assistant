@@ -79,7 +79,7 @@ text-to-sql-assistant/
 ├── models/
 │
 ├── outputs/
-│   ├── samples_20260724_014747.json
+│   ├── sample_results.txt
 │   └── README.md
 │
 ├── src/
@@ -230,7 +230,7 @@ The application automatically loads this key using **python-dotenv**, so no addi
 After completing the setup, execute the application with:
 
 ```bash
-python -m src.model_runner
+python src/model_runner.py
 ```
 
 Running this command performs the complete Text-to-SQL workflow:
@@ -471,7 +471,7 @@ Representative Outputs Saved
 After completing the installation and configuration steps, execute the application from the project root directory.
 
 ```bash
-python -m src.model_runner
+python src/model_runner.py
 ```
 
 Running this command automatically performs the following steps:
@@ -485,33 +485,6 @@ Running this command automatically performs the following steps:
 7. Executes the SQL query against the SQLite database.
 8. If execution fails, automatically enters the self-correction loop and retries the query (up to three attempts).
 9. Returns the final results and saves representative outputs to the `outputs/` directory.
-
----
-
-## Running with Docker
-
-For a fully reproducible environment, the project can also be run in a Docker container instead of a local virtual environment.
-
-### Prerequisites
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
-- A `.env` file in the project root containing your OpenAI API key (see Section 3 above)
-
-### Build the image
-
-```bash
-docker build -t text-to-sql-assistant .
-```
-
-### Run the container
-
-```bash
-docker run --env-file .env text-to-sql-assistant
-```
-
-This runs the same end-to-end pipeline as `python -m src.model_runner`, using the Docker image's own isolated Python environment. Results are saved inside the container to `outputs/`, matching the local run's behavior.
-
-**Note:** The Docker build uses `requirements-docker.txt`, a minimal dependency list containing only the packages the application needs to run (`openai`, `python-dotenv`, `PyYAML`). This is separate from the full `requirements.txt`, which includes local development tools (Jupyter, LangChain, etc.) not needed inside the container.
 
 ---
 
@@ -614,7 +587,6 @@ outputs/
 ```
 
 These outputs demonstrate the application's ability to answer a variety of Text-to-SQL questions and serve as examples for evaluation and future development.
-
 ## 7. Evaluation Summary
 
 The Text-to-SQL Assistant was evaluated using **20 benchmark questions** covering a variety of SQL tasks, including record retrieval, filtering, aggregation, sorting, ranking, and multi-table joins. The evaluation framework is implemented in `experiments/evaluation.ipynb` and was inspired by established Text-to-SQL benchmarks such as **Spider** and **BIRD**.
@@ -647,11 +619,11 @@ Accuracy: 95.00%
 | 7 | How many employees are in the database? | 8 | ✅ |
 | 8 | List all customers who live in Brazil. | Five customers returned | ✅ |
 | 9 | Which employee supports the most customers? | Jane Peacock (21 customers) | ❌* |
-| 10 | Which customer has spent the most money? | Customer #6 ($49.62) | ✅ |
+| 10 | Which customer has spent the most money? | Helena Holý ($49.62) | ✅ |
 | 11 | Which music genre has generated the highest revenue? | Rock ($826.65) | ✅ |
 | 12 | What is the average invoice total? | $5.65 | ✅ |
 | 13 | Which billing country generated the highest sales? | USA ($523.06) | ✅ |
-| 14 | Which playlist contains the most tracks? | Playlist #1 (3,290 tracks) | ✅ |
+| 14 | Which playlist contains the most tracks? | Music (3290 tracks) | ✅ |
 | 15 | Which media type contains the most tracks? | MPEG Audio File (3,034 tracks) | ✅ |
 | 16 | Which artist has the most tracks? | Iron Maiden (213 tracks) | ✅ |
 | 17 | How many customers have never placed an order? | 0 | ✅ |
@@ -680,13 +652,13 @@ An overall accuracy of **95%** indicates that the application performs reliably 
 
 ## 8. Model Selection
 
-Three models were compared during development:
+During development, we evaluated three candidate Large Language Models (LLMs) for natural language to SQL generation:
 
-- OpenAI GPT-4o-mini (primary)
-- Qwen2.5-7B-Instruct (open-source alternative, via HuggingFace)
-- SQLCoder-7B (SQL-specialized alternative, tested live on Northeastern's GPU cluster)
+- **OpenAI GPT-4o-mini**
+- **Qwen2.5-7B-Instruct**
+- **SQLCoder-7B**
 
-After experimentation, **OpenAI GPT-4o-mini** was selected as the primary model for the application.
+These models were selected based on their instruction-following capabilities, SQL generation performance, and suitability for integration into our application. After experimentation, **OpenAI GPT-4o-mini** was chosen as the primary model because it consistently produced the most accurate SQL queries while offering the best balance of performance, cost, and ease of deployment.
 
 ---
 
@@ -719,17 +691,13 @@ Using a temperature of **0** produces deterministic outputs, reducing randomness
 
 ## Alternative Models
 
-Several alternative models were evaluated during development.
+### SQLCoder-7B
 
-### SQLCoder
-
-SQLCoder produced strong SQL queries but required significantly more computational resources and was slower to integrate into the overall pipeline.
+SQLCoder-7B produced strong SQL queries but required significantly more computational resources and was slower to integrate into the overall pipeline.
 
 ### Qwen2.5-7B-Instruct
 
-Qwen matched GPT-4o-mini's accuracy on our test questions (3/3, no self-correction needed) and is free to run via HuggingFace's Inference API. It was not selected as primary due to GPT-4o-mini's existing integration and paid-API reliability.
-
-For the scope of this project, GPT-4o-mini provided the best combination of simplicity, reliability, and accuracy.
+Qwen2.5-7B-Instruct demonstrated promising performance and generated competitive SQL queries, but it required additional experimentation and tuning to consistently match GPT-4o-mini's SQL generation quality and reliability.
 
 ---
 
