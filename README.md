@@ -247,7 +247,7 @@ docker run --env-file .env text-to-sql-assistant
 
 This runs the same end-to-end pipeline as `python -m src.model_runner`, using the Docker image's own isolated Python environment. Results are saved inside the container to `outputs/`, matching the local run's behavior.
 
-**Note:** The Docker build uses `requirements-docker.txt`, a minimal dependency list containing only the packages the application actually needs at runtime (`openai`, `python-dotenv`, `PyYAML`). This is separate from the full `requirements.txt`, which also includes local development/notebook tools (Jupyter, ipykernel, etc.) and a few packages (such as LangChain) that were explored earlier in the project but are not used by the current pipeline.
+**Note:** The Docker build uses `requirements-docker.txt`, a minimal dependency list containing only the packages the application actually needs at runtime (`openai`, `python-dotenv`, `PyYAML`). This is separate from the full `requirements.txt`, which also includes local development/notebook tools (Jupyter, ipykernel, etc.) and a few packages (such as LangChain) that were explored earlier in the project but are not used by the current pipeline. A `.dockerignore` file is also included to prevent sensitive or unnecessary files (`.env`, `venv/`, `.git/`, cached notebooks, etc.) from being copied into the image during the build.
 
 ---
 
