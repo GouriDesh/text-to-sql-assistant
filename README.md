@@ -699,7 +699,7 @@ SQLCoder-7B produced strong SQL queries but required significantly more computat
 
 ### Qwen2.5-7B-Instruct
 
-Qwen2.5-7B-Instruct demonstrated promising performance and generated competitive SQL queries, but it required additional experimentation and tuning to consistently match GPT-4o-mini's SQL generation quality and reliability.
+Qwen2.5-7B-Instruct matched GPT-4o-mini's accuracy on our test questions (3/3, no self-correction needed) and is free to run via HuggingFace's Inference API. It was not selected as primary due to GPT-4o-mini's existing integration and paid-API reliability.
 
 *(For the full comparison, including live-test methodology and prompt-format differences, see `docs/model_selection.md`.)*
 
