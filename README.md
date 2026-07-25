@@ -15,7 +15,7 @@ Built as a group project (**Group 02**) to explore practical, lightweight Genera
 
 ## 1. Project Overview
 
-This project bridges the gap between complex relational databases and non-technical users. Instead of manually writing SQL queries, users can ask questions in plain English and receive accurate answers generated directly from a relational database.
+This project bridges the gap between complex relational databases and non-technical users. Instead of manually writing SQL queries, users can ask questions in plain English — for example, *"Which artist has the most albums?"* — and receive accurate answers generated directly from a relational database.
 
 ## Core Features
 
@@ -27,27 +27,23 @@ This project bridges the gap between complex relational databases and non-techni
 
 - **Synthesis & Output** – Executes validated SQL queries against a read-only SQLite database and returns conversational responses.
 
-### Example Questions
-
-- *Which artist has the most albums?*
-- *What are the top 5 genres by number of tracks?*
-- *How many customers are from the USA?*
-
 ---
 
 ## Technical Stack
 
-| Component | Technology |
-|-----------|------------|
-| LLM | OpenAI GPT-4o-mini |
-| Database | SQLite |
-| Dataset | Chinook Database |
-| Prompting | Schema-aware Prompt Engineering |
-| Safety | SQL Validation Module |
-| Environment | python-dotenv |
-| Language | Python |
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Programming Language | Python | Core application logic |
+| LLM | OpenAI GPT-4o-mini | Natural language to SQL generation |
+| Database | SQLite | Stores and queries the Chinook sample database |
+| Dataset | Chinook Database | Digital music store dataset used for testing |
+| Prompt Engineering | Schema-aware prompt templates | Builds prompts combining schema + user question |
+| Safety Validation | SQL Safety Module (`src/sql_safety.py`) | Validates generated SQL before execution |
+| Configuration | python-dotenv + PyYAML | Loads API keys and model settings |
+| Environment | Virtual environment + `requirements.txt` | Reproducible local Python environment |
+| Containerization | Docker (optional) | Fully reproducible runtime environment |
 
-The project uses the **Chinook** sample database, a well-known SQLite database representing a digital music store containing artists, albums, tracks, playlists, invoices, employees, and customers.
+The project uses the **Chinook** sample database, a well-known SQLite database representing a digital music store containing artists, albums, tracks, genres, media types, playlists, invoices, employees, and customers.
 
 ---
 
@@ -60,7 +56,6 @@ text-to-sql-assistant/
 │   └── model_config.yaml              # Model configuration and parameters
 │
 ├── data/
-│   ├── .gitkeep
 │   └── Chinook_Sqlite.sqlite          # Chinook sample SQLite database
 │
 ├── docs/
@@ -76,12 +71,10 @@ text-to-sql-assistant/
 │   ├── phase1_setup.ipynb
 │   └── schema_extraction.ipynb
 │
-├── models/
-│
 ├── outputs/
-├── description.md
-├── sample_output_before_safety_scrubber.json
-└── sample_output_after_safety_scrubber.json
+│   ├── description.md
+│   ├── sample_output_after_safety_scrubber.json
+│   └── sample_output_before_safety_scrubber.json
 │
 ├── src/
 │   ├── __init__.py
@@ -93,12 +86,16 @@ text-to-sql-assistant/
 │   ├── __init__.py
 │   └── helpers.py
 │
+├── .dockerignore
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE
 ├── README.md
+├── requirements-docker.txt
 └── requirements.txt
 ```
+
+> **Note:** A few folders (`data/`, `docs/`, `experiments/`) also contain a `.gitkeep` placeholder file used to keep the folder tracked by git before it had real content. These are omitted from the tree above for clarity since they no longer serve a functional purpose now that each folder holds real files.
 
 ## Directory Overview
 
@@ -108,7 +105,6 @@ text-to-sql-assistant/
 | **data/** | Contains the Chinook SQLite database used for query execution. |
 | **docs/** | Documentation describing the evaluation framework and model selection process. |
 | **experiments/** | Development notebooks used throughout the project lifecycle for experimentation and evaluation. |
-| **models/** | Stores model-related resources and experiments. |
 | **outputs/** | Contains representative generated outputs from the application. |
 | **src/** | Core application code, including data loading, SQL generation, validation, and pipeline execution. |
 | **utils/** | Shared helper functions used across the project. |
@@ -224,27 +220,34 @@ OPENAI_API_KEY=your-api-key-here
 
 The application automatically loads this key using **python-dotenv**, so no additional configuration is required.
 
+For instructions on running the application, see **Section 6: Running the Application** below.
+
 ---
 
-## Running the Application
+## Running with Docker
 
-After completing the setup, execute the application with:
+For a fully reproducible environment, the project can also be run in a Docker container instead of a local virtual environment.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- A `.env` file in the project root containing your OpenAI API key (see "Configure Your OpenAI API Key" above)
+
+### Build the image
 
 ```bash
-python src/model_runner.py
+docker build -t text-to-sql-assistant .
 ```
 
-Running this command performs the complete Text-to-SQL workflow:
+### Run the container
 
-1. Loads the Chinook SQLite database.
-2. Extracts the database schema.
-3. Builds a schema-aware prompt.
-4. Sends the prompt to GPT-4o-mini.
-5. Generates an SQL query.
-6. Validates the SQL using the safety module.
-7. Executes the query against the database.
-8. If necessary, retries failed SQL generation using the self-correction loop.
-9. Displays the results and saves representative outputs in the `outputs/` directory.
+```bash
+docker run --env-file .env text-to-sql-assistant
+```
+
+This runs the same end-to-end pipeline as `python -m src.model_runner`, using the Docker image's own isolated Python environment. Results are saved inside the container to `outputs/`, matching the local run's behavior.
+
+**Note:** The Docker build uses `requirements-docker.txt`, a minimal dependency list containing only the packages the application actually needs at runtime (`openai`, `python-dotenv`, `PyYAML`). This is separate from the full `requirements.txt`, which also includes local development/notebook tools (Jupyter, ipykernel, etc.) and a few packages (such as LangChain) that were explored earlier in the project but are not used by the current pipeline.
 
 ---
 
@@ -390,6 +393,7 @@ OPENAI_API_KEY=your-api-key-here
 ```
 
 Once your `.env` file has been created, no further configuration is required.
+
 ## 5. System Architecture
 
 The Text-to-SQL Assistant follows a modular pipeline that converts a user's natural language question into an executable SQL query, validates the generated SQL, executes it against the Chinook SQLite database, and returns a conversational response.
@@ -425,7 +429,8 @@ Success   Failure
    │   Self-Correction Loop
    │   ├── Returns SQL error message
    │   ├── Generates corrected SQL
-   │   └── Retries execution (up to 3 attempts)
+   │   ├── Re-validates the corrected SQL (Safety Validation)
+   │   └── Retries execution (up to 3 attempts total)
    │
    └────┬────┘
         ▼
@@ -450,29 +455,16 @@ Representative Outputs Saved
 | **Self-Correction Loop** | Repairs failed SQL queries by using the returned database error message to generate a corrected query. |
 | **Output Generator** | Displays query results and saves representative outputs for evaluation. |
 
----
-
-## Technology Stack
-
-| Layer | Technology | Purpose |
-|------|------------|---------|
-| **Programming Language** | Python | Core application logic |
-| **LLM** | OpenAI GPT-4o-mini | Natural language to SQL generation |
-| **Database** | SQLite | Stores the Chinook sample database |
-| **Dataset** | Chinook | Digital music store database used for testing |
-| **Prompt Engineering** | Custom prompt templates | Creates schema-aware prompts |
-| **Validation** | SQL Safety Module | Verifies generated SQL before execution |
-| **Configuration** | python-dotenv + YAML | Loads API keys and application settings |
-| **Environment** | Virtual Environment + requirements.txt | Reproducible Python environment |
+*(See the "Technical Stack" table in Section 1 for the full list of technologies used.)*
 
 ---
 
 ## 6. Running the Application
 
-After completing the installation and configuration steps, execute the application from the project root directory.
+After completing the installation and configuration steps described in Section 3, execute the application from the project root directory.
 
 ```bash
-python src/model_runner.py
+python -m src.model_runner
 ```
 
 Running this command automatically performs the following steps:
@@ -486,6 +478,8 @@ Running this command automatically performs the following steps:
 7. Executes the SQL query against the SQLite database.
 8. If execution fails, automatically enters the self-correction loop and retries the query (up to three attempts).
 9. Returns the final results and saves representative outputs to the `outputs/` directory.
+
+To run the same pipeline inside a Docker container instead, see **"Running with Docker"** in Section 3.
 
 ---
 
@@ -583,11 +577,16 @@ Example:
 
 ```text
 outputs/
-├── sample_results.txt
-└── README.md
+├── description.md
+├── sample_output_after_safety_scrubber.json
+└── sample_output_before_safety_scrubber.json
 ```
 
+- `sample_output_before_safety_scrubber.json` — 5 questions, run before the SQL safety scrubber (`src/sql_safety.py`) was added.
+- `sample_output_after_safety_scrubber.json` — the same 5 questions, plus a 6th question added specifically to test the scrubber.
+
 These outputs demonstrate the application's ability to answer a variety of Text-to-SQL questions and serve as examples for evaluation and future development.
+
 ## 7. Evaluation Summary
 
 The Text-to-SQL Assistant was evaluated using **20 benchmark questions** covering a variety of SQL tasks, including record retrieval, filtering, aggregation, sorting, ranking, and multi-table joins. The evaluation framework is implemented in `experiments/evaluation.ipynb` and was inspired by established Text-to-SQL benchmarks such as **Spider** and **BIRD**.
@@ -616,7 +615,7 @@ Accuracy: 95.00%
 | 3 | Which country has the most customers? | USA (13) | ✅ |
 | 4 | Which artist has released the most albums? | Iron Maiden (21) | ✅ |
 | 5 | How many invoices are in the database? | 412 | ✅ |
-| 6 | What are the five longest tracks? | Occupation / Precipice, Through a Looking Glass, and others | ✅ |
+| 6 | What are the five longest tracks? | Occupation / Precipice, Through a Looking Glass, Greetings from Earth, Pt. 1, The Man With Nine Lives, Battlestar Galactica, Pt. 2 | ✅ |
 | 7 | How many employees are in the database? | 8 | ✅ |
 | 8 | List all customers who live in Brazil. | Five customers returned | ✅ |
 | 9 | Which employee supports the most customers? | Jane Peacock (21 customers) | ❌* |
@@ -625,7 +624,7 @@ Accuracy: 95.00%
 | 12 | What is the average invoice total? | $5.65 | ✅ |
 | 13 | Which billing country generated the highest sales? | USA ($523.06) | ✅ |
 | 14 | Which playlist contains the most tracks? | Music (3290 tracks) | ✅ |
-| 15 | Which media type contains the most tracks? | MPEG Audio File (3,034 tracks) | ✅ |
+| 15 | Which media type contains the most tracks? | MPEG audio file (3,034 tracks) | ✅ |
 | 16 | Which artist has the most tracks? | Iron Maiden (213 tracks) | ✅ |
 | 17 | How many customers have never placed an order? | 0 | ✅ |
 | 18 | Which country has the highest average invoice total?  | Chile ($6.66) | ✅ |
@@ -635,6 +634,7 @@ Accuracy: 95.00%
 > **\*** Question 9 was marked incorrect because the evaluation script compared the output using an exact string match. The generated SQL correctly identified **Jane Peacock** as the employee supporting **21 customers**, but the formatting of the returned result differed from the expected output.
 > The single reported failure was **not caused by incorrect SQL generation**.
 > This discrepancy reflects a limitation of the evaluation script rather than a failure of the Text-to-SQL pipeline itself.
+
 ---
 
 ## Performance Analysis
@@ -649,6 +649,7 @@ The evaluation demonstrates that the pipeline successfully handles a wide range 
 - Ranking and Top-*N* queries
 
 An overall accuracy of **95%** indicates that the application performs reliably across representative Text-to-SQL tasks using the Chinook database.
+
 ---
 
 ## 8. Model Selection
@@ -700,6 +701,8 @@ SQLCoder-7B produced strong SQL queries but required significantly more computat
 
 Qwen2.5-7B-Instruct demonstrated promising performance and generated competitive SQL queries, but it required additional experimentation and tuning to consistently match GPT-4o-mini's SQL generation quality and reliability.
 
+*(For the full comparison, including live-test methodology and prompt-format differences, see `docs/model_selection.md`.)*
+
 ---
 
 ## 9. Future Improvements
@@ -713,6 +716,7 @@ Possible future enhancements include:
 - Add support for database visualization and schema exploration.
 - Implement conversation memory for multi-turn database interactions.
 - Integrate additional open-source LLMs for side-by-side model comparison.
+- Rewrite the evaluator to use Execution Accuracy (comparing actual query result values rather than exact string matches), which would resolve the Question 9 false-negative described above.
 
 ---
 
