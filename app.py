@@ -13,7 +13,7 @@ from src/data_loader.py and src/model_runner.py.
 Run with:
     streamlit run app.py
 """
-
+import sqlite3
 import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
@@ -32,10 +32,11 @@ def get_pipeline_resources():
     client = OpenAI()
 
     config = load_config()
-    conn, cursor = connect_db(config["db_path"])
+    conn = sqlite3.connect(config["db_path"], check_same_thread=False)
+    cursor = conn.cursor()
     schema = get_schema(cursor)
     schema_string = get_schema_string(cursor)
-
+    cursor = conn.cursor()
     return client, config, cursor, schema, schema_string
 
 
