@@ -91,6 +91,7 @@ text-to-sql-assistant/
 ├── Dockerfile
 ├── LICENSE
 ├── README.md
+├── app.py                             # Streamlit UI entry point
 ├── requirements-docker.txt
 └── requirements.txt
 ```
@@ -587,6 +588,19 @@ outputs/
 
 These outputs demonstrate the application's ability to answer a variety of Text-to-SQL questions and serve as examples for evaluation and future development.
 
+## Running the Streamlit App
+
+Launch the interactive Streamlit interface from the project root:
+
+```bash
+streamlit run app.py
+```
+
+By default, the application opens in your web browser at **http://localhost:8501**.
+
+Enter a question in plain English, and the application generates the corresponding SQL query, executes it against the Chinook database, and displays both the generated SQL and the query results.
+
+
 ## 7. Evaluation Summary
 
 The Text-to-SQL Assistant was evaluated using **20 benchmark questions** covering a variety of SQL tasks, including record retrieval, filtering, aggregation, sorting, ranking, and multi-table joins. The evaluation framework is implemented in `experiments/evaluation.ipynb` and was inspired by established Text-to-SQL benchmarks such as **Spider** and **BIRD**.
@@ -709,7 +723,6 @@ Qwen2.5-7B-Instruct matched GPT-4o-mini's accuracy on our test questions (3/3, n
 
 Possible future enhancements include:
 
-- Develop a Streamlit web interface for interactive user queries.
 - Support multiple relational database systems beyond SQLite.
 - Improve SQL safety validation using abstract syntax tree (AST) parsing.
 - Expand benchmark testing with larger Text-to-SQL datasets.
